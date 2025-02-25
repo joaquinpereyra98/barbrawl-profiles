@@ -17,9 +17,9 @@ export default function registerSettings() {
     CONSTANTS.MODULE_ID,
     CONSTANTS.SETTINGS.PROFILES_MENU,
     {
-      name: "barbrawlProfiles",
+      name: "Barbrawl Profiles Manager",
       label: "Barbrawl Profile Manager",
-      hint: "Manage Barbrawl bar profiles for tokens, including creation, editing, and deletion",
+      hint: "Manage Barbrawl profiles",
       icon: "fas fa-bars",
       type: BarbrawlProfileConfig,
       restricted: true,
