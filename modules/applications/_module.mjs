@@ -1,0 +1,1 @@
+export { default as BarbrawlProfileConfig} from "./barbrawl-profile-config.mjs";
