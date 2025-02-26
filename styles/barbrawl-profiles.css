@@ -1,0 +1,45 @@
+.barbrawl-profile-config {
+    .body-config {
+        padding: 0.5rem;
+        max-height: 500px;
+        overflow-y: auto;
+
+        .profiles-header {
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            font-size: large;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.4rem 0.4rem 0 0;
+            color: white;
+        }
+
+        .profile-list {
+            padding: 0.2rem 0.5rem;
+            font-weight: bold;
+            font-size: medium;
+            list-style: none;
+            margin: 0;
+            min-height: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+
+            .profile-name {
+                height: 1.5rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .profile-controls {
+            display: flex;
+            flex: 0 0 50px;
+            justify-content: flex-end;
+
+            a {
+                font-size: small;
+                margin: 0 0.2rem;
+            }
+        }
+    }
+}
