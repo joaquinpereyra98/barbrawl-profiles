@@ -1,4 +1,5 @@
 import CONSTANTS from "../constants.mjs";
+import UTILS from "../utils.mjs";
 
 const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
@@ -17,7 +18,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
       game.settings.get("barbrawl-profiles", "profiles")?.profiles ?? [];
   }
 
-  _openDialogs = new Set();
+  _openDialogs = new Collection();
 
   /** @inheritDoc */
   static DEFAULT_OPTIONS = {
@@ -45,7 +46,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
     form: {
       handler: BarbrawlProfileConfig.#formHandler,
       submitOnChange: false,
-      closeOnSubmit: false,
+      closeOnSubmit: true,
     },
     position: { width: 400, height: "auto" },
     actions: {
@@ -85,7 +86,19 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
    * @param {HTMLFormElement} form - The form element that was submitted
    * @param {FormDataExtended} formData - Processed data for the submitted form
    */
-  static async #formHandler(event, form, formData) {}
+  static async #formHandler(event, form, formData) {
+    return await game.settings.set("barbrawl-profiles", "profiles", {profiles: this.profiles});
+  }
+
+  /** @inheritDoc */
+  async close(options = {}) {
+    if (this._openDialogs.size) {
+      this._openDialogs.forEach((dialog) => {
+        dialog.close();
+      });
+    }
+    return super.close(options);
+  }
 
   /* -------------------------------------------- */
   /*  Event Listeners and Handlers                */
@@ -118,7 +131,9 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
       name: `New Profile ${number}`,
       id: foundry.utils.randomID(16),
       sort: this.profiles.length,
+      barData: UTILS.createFirstTwoBars(),
     });
+
     this.render();
   }
 
@@ -130,14 +145,31 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   static async _editProfile(event, target) {
     event.preventDefault();
     const profileId = target.closest(".profile")?.dataset?.id;
-    const profile = this.profiles.find((p) => p.id === profileId);
+    const profileIndex = this.profiles.findIndex((p) => p.id === profileId);
 
-    if (!profile) return;
+    if (profileIndex === -1) return;
+
+    const profile = this.profiles[profileIndex];
 
     const { BarbrawlProfileDialog } = game.modules.get(
       CONSTANTS.MODULE_ID
     ).apps;
-    const dialog = new BarbrawlProfileDialog({ profile });
+    const dialog = new BarbrawlProfileDialog({
+      profile,
+      callbackClose: () => {
+        this._openDialogs.delete(dialog.id);
+      },
+      callbackSubmit: (profileData) => {
+        foundry.utils.mergeObject(profileData, profile, {
+          overwrite: false
+        })
+        this.profiles[profileIndex] = profileData;
+        console.log(this.profiles[profileIndex])
+        this.render();
+      },
+    });
+
+    this._openDialogs.set(dialog.id, dialog);
     dialog.render(true);
   }
 }

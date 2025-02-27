@@ -1,8 +1,10 @@
-.barbrawl-profile-config {
+.barbrawl-profile-config,
+.barbrawl-profile-dialog {
     .body-config {
         padding: 0.5rem;
         max-height: 500px;
         overflow-y: auto;
+        overflow-x: hidden;
 
         .profiles-header {
             align-items: center;
@@ -20,7 +22,7 @@
             font-size: medium;
             list-style: none;
             margin: 0;
-            min-height: 20px;
+            min-height: 24px;
             background-color: rgba(0, 0, 0, 0.3);
 
             .profile-name {
@@ -39,6 +41,37 @@
             a {
                 font-size: small;
                 margin: 0 0.2rem;
+            }
+        }
+
+        .indent-details {
+            overflow-y: auto;
+            max-height: 300px;
+
+            .advanced-details {
+                overflow-x: hidden;
+            }
+
+            .form-fields {
+                label {
+                    flex: 0 0 50px;
+
+                    span {
+                        white-space: nowrap;
+                    }
+
+                }
+
+                input.color {
+                    text-align: center;
+                    min-width: 8ch;
+                    padding: 0;  
+                }
+            }
+
+            p.notes {
+                color: inherit;
+                opacity: 0.7;
             }
         }
     }
