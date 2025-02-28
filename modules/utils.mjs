@@ -1,4 +1,4 @@
-import CONSTANTS from './constants.mjs';
+import CONSTANTS from "./constants.mjs";
 /**
  * Generates a unique bar ID for a new resource bar.
  * - If no bars exist, it starts with `"bar1"`.
@@ -46,40 +46,59 @@ const getDefaultBarData = (barsIds) => {
  * @returns {Object} - An object containing the configurations for "bar1" and "bar2".
  */
 function createFirstTwoBars() {
-    const bar1 = {
-        id: "bar1",
-      order: 0,
-      attribute: "custom",
-      mincolor: "#FF0000",
-      maxcolor: "#80FF00",
-      position: "bottom-inner",
-      value: 10,
-      max: 10,
-      gmVisibility: CONSTANTS.BAR_VISIBILITY.INHERIT,
-      ownerVisibility: CONSTANTS.BAR_VISIBILITY.ALWAYS,
-      otherVisibility: CONSTANTS.BAR_VISIBILITY.NONE,
-    };
-  
-    const bar2 = {
-    id: "bar2",
-      order: 1,
-      attribute: "custom",
-      mincolor: "#000080",
-      maxcolor: "#80B3FF",
-      position: "top-inner",
-      value: 10,
-      max: 10,
-      gmVisibility: CONSTANTS.BAR_VISIBILITY.INHERIT,
-      ownerVisibility: CONSTANTS.BAR_VISIBILITY.ALWAYS,
-      otherVisibility: CONSTANTS.BAR_VISIBILITY.NONE,
-    };
-  
-    return {bar1, bar2};
+  const bar1 = {
+    id: "bar1",
+    order: 0,
+    attribute: "custom",
+    mincolor: "#FF0000",
+    maxcolor: "#80FF00",
+    position: "bottom-inner",
+    value: 10,
+    max: 10,
+    gmVisibility: CONSTANTS.BAR_VISIBILITY.INHERIT,
+    ownerVisibility: CONSTANTS.BAR_VISIBILITY.ALWAYS,
+    otherVisibility: CONSTANTS.BAR_VISIBILITY.NONE,
   };
+
+  const bar2 = {
+    id: "bar2",
+    order: 1,
+    attribute: "custom",
+    mincolor: "#000080",
+    maxcolor: "#80B3FF",
+    position: "top-inner",
+    value: 10,
+    max: 10,
+    gmVisibility: CONSTANTS.BAR_VISIBILITY.INHERIT,
+    ownerVisibility: CONSTANTS.BAR_VISIBILITY.ALWAYS,
+    otherVisibility: CONSTANTS.BAR_VISIBILITY.NONE,
+  };
+
+  return { bar1, bar2 };
+}
+
+/**
+ * Generates a new unique profile name based on existing profiles.
+ *
+ * @param {Array<{ name: string }>} profiles - List of profiles.
+ * @returns {String} - A unique profile name.
+ */
+function generateNewProfileName(profiles) {
+  const baseName = "New Profile";
+  if (!profiles.length) return baseName;
+
+  const existingNames = new Set(profiles.map((p) => p.name));
+  let number = 1;
+
+  while (existingNames.has(`${baseName} (${number})`)) number++;
+
+  return number === 1 ? baseName : `${baseName} (${number})`;
+}
 
 const UTILS = {
   getDefaultBarData,
-  createFirstTwoBars
+  createFirstTwoBars,
+  generateNewProfileName,
 };
 
 export default UTILS;

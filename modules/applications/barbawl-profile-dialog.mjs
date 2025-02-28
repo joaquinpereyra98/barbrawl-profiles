@@ -35,7 +35,7 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     },
     form: {
       submitOnChange: false,
-      closeOnSubmit: true,
+      closeOnSubmit: false,
       handler: BarbrawlProfileDialog.#formHandler,
     },
     position: { width: 480, height: "auto" },
@@ -178,12 +178,12 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     };
   }
 
-  _prepareImgPathFields(barId, pathValue="", pathKey) {
+  _prepareImgPathFields(barId, pathValue = "", pathKey) {
     const { FilePathField } = foundry.data.fields;
     const field = new FilePathField(
       {
         initial: pathValue,
-        categories: ["IMAGE"]
+        categories: ["IMAGE"],
       },
       {
         name: `barData.${barId}.${pathKey}`,
@@ -207,10 +207,23 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     const profileData = foundry.utils.expandObject(formData.object);
     if (this.callbackSubmit instanceof Function)
       this.callbackSubmit(profileData);
+
+    return this.close({ submitted: true });
   }
 
   /** @inheritDoc */
   async close(options = {}) {
+    if (!options.submitted) {
+      const proceed = await foundry.applications.api.DialogV2.confirm({
+        content:
+          "Are you sure you want to close? Unsaved changes will be lost.",
+        rejectClose: false,
+        modal: true,
+      });
+
+      if (!proceed) return;
+    }
+
     if (this.callbackClose instanceof Function) this.callbackClose();
     return super.close(options);
   }

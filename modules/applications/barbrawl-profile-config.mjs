@@ -46,7 +46,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
     form: {
       handler: BarbrawlProfileConfig.#formHandler,
       submitOnChange: false,
-      closeOnSubmit: true,
+      closeOnSubmit: false,
     },
     position: { width: 400, height: "auto" },
     actions: {
@@ -54,6 +54,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
       editProfile: BarbrawlProfileConfig._editProfile,
       importJson: BarbrawlProfileConfig._importJson,
       exportJson: BarbrawlProfileConfig._exportJson,
+      deleteProfile: BarbrawlProfileConfig._deleteProfile,
     },
   };
 
@@ -87,17 +88,35 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
    * @param {FormDataExtended} formData - Processed data for the submitted form
    */
   static async #formHandler(event, form, formData) {
-    return await game.settings.set("barbrawl-profiles", "profiles", {profiles: this.profiles});
+    await game.settings.set("barbrawl-profiles", "profiles", {
+      profiles: this.profiles,
+    });
+
+    return this.close({ submitted: true });
   }
 
   /** @inheritDoc */
   async close(options = {}) {
+    if (!options.submitted) {
+      const proceed = await foundry.applications.api.DialogV2.confirm({
+        content:
+          "Are you sure you want to close? Unsaved changes will be lost.",
+        rejectClose: false,
+        modal: true,
+      });
+
+      if (!proceed) return;
+    }
+
+    return super.close(options);
+  }
+
+  _onClose(options) {
     if (this._openDialogs.size) {
       this._openDialogs.forEach((dialog) => {
         dialog.close();
       });
     }
-    return super.close(options);
   }
 
   /* -------------------------------------------- */
@@ -109,13 +128,115 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
    * @param {PointerEvent} event - The originating click event
    * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
    */
-  static _importJson(event, target) {}
+  static async _importJson(event, target) {
+    const { DialogV2 } = foundry.applications.api;
+    const { BooleanField } = foundry.data.fields;
+
+    const overwriteField = new BooleanField(
+      {
+        initial: false,
+        label: "Overwrite Existing Data",
+        hint: "If enabled, the imported JSON data will replace all existing data. If disabled, the imported data will be merged with the current data.",
+      },
+      { name: "overwriteData" }
+    ).toFormGroup().outerHTML;
+
+    const action = await DialogV2.wait({
+      window: { title: "Import Profile Data" },
+      content: `<div class="form-group">
+            <label for="data">${game.i18n.localize(
+              "DOCUMENT.ImportSource"
+            )}</label>
+            <input type="file" name="data" accept=".json"/>
+        </div> ${overwriteField}`,
+      position: { width: 450 },
+      modal: true,
+      buttons: [
+        {
+          action: "import",
+          default: false,
+          label: "Import",
+          icon: "fa-solid fa-file-import",
+          callback: (_, button) => ({
+            data: button.form.data.files,
+            overwriteData: button.form.overwriteData.checked,
+          }),
+        },
+        {
+          action: "cancel",
+          default: true,
+          label: "Cancel",
+          icon: "fas fa-times",
+        },
+      ],
+      rejectClose: false,
+    });
+
+    if (!action || action === "cancel") return;
+
+    const { data, overwriteData } = action;
+    if (!data.length)
+      return ui.notifications.error("You did not upload a data file!");
+
+    const importedProfiles = JSON.parse(
+      await readTextFromFile(data[0])
+    ).profiles;
+
+    let profiles = overwriteData
+      ? [...importedProfiles]
+      : [...this.profiles, ...importedProfiles];
+
+    const existingIds = new Set();
+    profiles = profiles.map((profile) => {
+      const isValidId =
+        profile.id && typeof profile.id === "string" && profile.id.length >= 16;
+
+      if (!isValidId || existingIds.has(profile.id)) {
+        profile.id = foundry.utils.randomID();
+      }
+
+      existingIds.add(profile.id);
+      return profile;
+    });
+    this.profiles = profiles;
+    await game.settings.set("barbrawl-profiles", "profiles", { profiles });
+    this.render();
+  }
+
   /**
    *
    * @param {PointerEvent} event - The originating click event
    * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
    */
-  static _exportJson(event, target) {}
+  static async _exportJson(event, target) {
+    event.preventDefault();
+
+    const settingData = game.settings.get("barbrawl-profiles", "profiles");
+    const filename = `barbrawl-profiles-${new Date()
+      .toISOString()
+      .replace(/[:.]/g, "-")}`;
+
+    if (!foundry.utils.objectsEqual(settingData.profiles, this.profiles)) {
+      const proceed = await foundry.applications.api.DialogV2.confirm({
+        content:
+          "The current profiles differ from the saved ones. Do you want to overwrite the settings?",
+        rejectClose: false,
+        modal: true,
+      });
+
+      if (!proceed) return;
+
+      await game.settings.set("barbrawl-profiles", "profiles", {
+        profiles: this.profiles,
+      });
+    }
+
+    saveDataToFile(
+      JSON.stringify({ profiles: this.profiles }, null, 2),
+      "text/json",
+      `${filename}.json`
+    );
+  }
 
   /**
    *
@@ -123,14 +244,13 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
    * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
    */
   static _createProfile(event, target) {
-    const existingNames = new Set(this.profiles.map((p) => p.name));
-    let number = 1;
-    while (existingNames.has(`New Profile ${number}`)) number++;
+    event.preventDefault();
+
+    const name = UTILS.generateNewProfileName(this.profiles);
 
     this.profiles.push({
-      name: `New Profile ${number}`,
+      name,
       id: foundry.utils.randomID(16),
-      sort: this.profiles.length,
       barData: UTILS.createFirstTwoBars(),
     });
 
@@ -161,15 +281,37 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
       },
       callbackSubmit: (profileData) => {
         foundry.utils.mergeObject(profileData, profile, {
-          overwrite: false
-        })
+          overwrite: false,
+        });
         this.profiles[profileIndex] = profileData;
-        console.log(this.profiles[profileIndex])
         this.render();
       },
     });
 
     this._openDialogs.set(dialog.id, dialog);
     dialog.render(true);
+  }
+
+  /**
+   *
+   * @param {PointerEvent} event - The originating click event
+   * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
+   */
+  static async _deleteProfile(event, target) {
+    event.preventDefault();
+
+    const profileId = target.closest(".profile")?.dataset?.id;
+    if (!profileId) return;
+
+    const proceed = await foundry.applications.api.DialogV2.confirm({
+      content: "Are you sure you want to delete this profile?",
+      rejectClose: false,
+      modal: true,
+    });
+
+    if (!proceed) return;
+
+    this.profiles = this.profiles.filter((p) => p.id !== profileId);
+    this.render();
   }
 }
