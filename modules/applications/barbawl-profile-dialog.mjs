@@ -12,18 +12,13 @@ const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
   ApplicationV2
 ) {
-  /**
-   * @param {Object} options
-   * @param {Object} options.profile
-   * @param {Function} options.callbackClose
-   * @param {Function} options.callbackSubmit
-   */
   constructor(options) {
     super(options);
     this.profile = options.profile;
     this.callbackClose = options.callbackClose;
     this.callbackSubmit = options.callbackSubmit;
   }
+
   /** @inheritDoc */
   static DEFAULT_OPTIONS = {
     tag: "form",
@@ -44,6 +39,7 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     },
   };
 
+  /** @inheritDoc */
   _onRender(context, options) {
     this.element.querySelectorAll(".input-attribute").forEach((input) => {
       input.addEventListener("change", (ev) => {
@@ -126,6 +122,11 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     };
   }
 
+  /**
+   * Prepares the name field for the profile, ensuring it is a non-null, non-blank string.
+   *
+   * @returns {foundry.data.fields.StringField} - A configured string field for the name.
+   */
   _prepareNameField() {
     const nameValue = this.profile.name;
 
@@ -139,6 +140,11 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     );
   }
 
+  /**
+   * Duplicates the profile's bar data and prepares its fields, including colors and images.
+   *
+   * @returns {Object} - The processed bar data with updated field configurations.
+   */
   _prepareBarData() {
     const barData = foundry.utils.duplicate(this.profile.barData);
 
@@ -159,6 +165,14 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     return barData;
   }
 
+  /**
+   * Prepares a color field for a specific bar, ensuring it has a valid color value.
+   *
+   * @param {string} barId - The unique identifier of the bar.
+   * @param {string} colorValue - The initial color value.
+   * @param {string} colorKey - The key associated with the color field (e.g., "mincolor" or "maxcolor").
+   * @returns {{ field: foundry.data.fields.ColorField, value: string }} - The configured color field and its value.
+   */
   _prepareColorsFields(barId, colorValue, colorKey) {
     const { ColorField } = foundry.data.fields;
     const field = new ColorField(
@@ -178,6 +192,14 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     };
   }
 
+  /**
+   * Prepares an image path field for a specific bar, allowing users to select an image file.
+   *
+   * @param {string} barId - The unique identifier of the bar.
+   * @param {string} [pathValue=""] - The initial file path for the image.
+   * @param {string} pathKey - The key associated with the image field (e.g., "fgImage" or "bgImage").
+   * @returns {{ field: foundry.data.fields.FilePathField, value: string }} - The configured file path field and its value.
+   */
   _prepareImgPathFields(barId, pathValue = "", pathKey) {
     const { FilePathField } = foundry.data.fields;
     const field = new FilePathField(
@@ -228,7 +250,18 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     return super.close(options);
   }
 
-  static _addResource() {
+  /* -------------------------------------------- */
+  /*  Event Listeners and Handlers                */
+  /* -------------------------------------------- */
+
+  /**
+   * Creates a new resource for the profile with default bar data, then updates the UI
+   *
+   * @param {PointerEvent} event - The click event that triggered the import.
+   * @param {HTMLElement} target - The HTML element that initiated the action, containing the [data-action] attribute.
+   */
+  static _addResource(event, target) {
+    event.preventDefault();
     const barsIds = Object.keys(this.profile.barData);
     const newBar = UTILS.getDefaultBarData(barsIds);
 

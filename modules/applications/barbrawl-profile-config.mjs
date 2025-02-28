@@ -111,12 +111,14 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
     return super.close(options);
   }
 
-  _onClose(options) {
+  /** @inheritDoc */
+  _onClose(options = {}) {
     if (this._openDialogs.size) {
       this._openDialogs.forEach((dialog) => {
         dialog.close();
       });
     }
+    super._onClose(options);
   }
 
   /* -------------------------------------------- */
@@ -124,9 +126,10 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   /* -------------------------------------------- */
 
   /**
+   * Imports profile data from a JSON file. Allows the user to choose whether to overwrite existing data or merge it.
    *
-   * @param {PointerEvent} event - The originating click event
-   * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
+   * @param {PointerEvent} event - The click event that triggered the import.
+   * @param {HTMLElement} target - The HTML element that initiated the action, containing the [data-action] attribute.
    */
   static async _importJson(event, target) {
     const { DialogV2 } = foundry.applications.api;
@@ -204,9 +207,11 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   }
 
   /**
+   * Exports the current profile data as a JSON file.
+   * If the stored profiles differ from the current ones, prompts the user for confirmation before overwriting.
    *
-   * @param {PointerEvent} event - The originating click event
-   * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
+   * @param {PointerEvent} event - The click event that triggered the export.
+   * @param {HTMLElement} target - The HTML element that initiated the action, containing the [data-action] attribute.
    */
   static async _exportJson(event, target) {
     event.preventDefault();
@@ -239,9 +244,10 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   }
 
   /**
+   * Creates a new profile with a generated name and default bar data, then updates the UI.
    *
-   * @param {PointerEvent} event - The originating click event
-   * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
+   * @param {PointerEvent} event - The click event that triggered the profile creation.
+   * @param {HTMLElement} target - The HTML element that initiated the action, containing the [data-action] attribute.
    */
   static _createProfile(event, target) {
     event.preventDefault();
@@ -258,9 +264,10 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   }
 
   /**
+   * Opens a dialog to edit an existing profile. Updates the profile data upon submission.
    *
-   * @param {PointerEvent} event - The originating click event
-   * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
+   * @param {PointerEvent} event - The click event that triggered the profile edit.
+   * @param {HTMLElement} target - The HTML element that initiated the action, containing the [data-action] attribute.
    */
   static async _editProfile(event, target) {
     event.preventDefault();
@@ -293,9 +300,10 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   }
 
   /**
+   * Deletes a profile after confirming with the user.
    *
-   * @param {PointerEvent} event - The originating click event
-   * @param {HTMLElement} target -The capturing HTML element which defines the [data-action]
+   * @param {PointerEvent} event - The click event that triggered the profile deletion.
+   * @param {HTMLElement} target - The HTML element that initiated the action, containing the [data-action] attribute.
    */
   static async _deleteProfile(event, target) {
     event.preventDefault();

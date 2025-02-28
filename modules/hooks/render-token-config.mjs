@@ -1,8 +1,9 @@
 import UTILS from "../utils.mjs";
 
 /**
- * Imports a profile to the token.
+ * Imports a profile from the world-setting to the token.
  * @param {TokenDocument} tokenDoc - The Token document instance.
+ * @returns {TokenDocument|null} - The updated TokenDocument instance or null.
  */
 async function importProfile(tokenDoc) {
   const profiles =
@@ -28,17 +29,22 @@ async function importProfile(tokenDoc) {
     rejectClose: false,
   });
 
-  if (!profileId) return;
+  if (!profileId) return null;
 
   const barData = profiles.find((p) => p.id === profileId)?.barData;
   if (barData) {
-    await tokenDoc.update(
+    return await tokenDoc.update(
       { "flags.barbrawl.resourceBars": barData },
       { diff: false }
     );
   }
 }
 
+/**
+ * Export the bardata from a token to the world-setting
+ * @param {TokenDocument} tokenDoc - The Token document instance 
+ * @returns {Object} - The assigned setting value
+ */
 async function exportProfile(tokenDoc) {
   const { StringField } = foundry.data.fields;
 
@@ -78,7 +84,7 @@ async function exportProfile(tokenDoc) {
     barData,
   });
 
-  await game.settings.set("barbrawl-profiles", "profiles", { profiles });
+  return await game.settings.set("barbrawl-profiles", "profiles", { profiles });
 }
 /**
  * Appends a context menu item for saving or loading profiles when the `#context-menu` element is attached.
