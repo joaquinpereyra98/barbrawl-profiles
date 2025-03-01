@@ -26,4 +26,22 @@ export default function registerSettings() {
       restricted: true,
     }
   );
+
+  if (game.modules.get("token-mold")) {
+    game.settings.register(
+      CONSTANTS.MODULE_ID,
+      CONSTANTS.SETTINGS.PROFILES_TOKEN_MOLD,
+      {
+        names: "Profies Token Mold Storage",
+        scope: "world",
+        config: false,
+        type: data.TokenMoldSetting,
+        requiresReload: false,
+        default: {
+          profile: "",
+          overwrite: false,
+        },
+      }
+    );
+  }
 }

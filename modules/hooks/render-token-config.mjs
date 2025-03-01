@@ -1,4 +1,5 @@
 import UTILS from "../utils.mjs";
+import CONSTANTS from "../constants.mjs";
 
 /**
  * Imports a profile from the world-setting to the token.
@@ -7,7 +8,7 @@ import UTILS from "../utils.mjs";
  */
 async function importProfile(tokenDoc) {
   const profiles =
-    game.settings.get("barbrawl-profiles", "profiles")?.profiles ?? [];
+    game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES)?.profiles ?? [];
 
   const profileChoices = profiles.reduce(
     (acc, { id, name }) => ({ ...acc, [id]: name }),
@@ -50,7 +51,7 @@ async function exportProfile(tokenDoc) {
   const { StringField } = foundry.data.fields;
 
   const profiles =
-    game.settings.get("barbrawl-profiles", "profiles")?.profiles ?? [];
+    game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES)?.profiles ?? [];
 
   const nameField = new StringField(
     {
@@ -85,7 +86,7 @@ async function exportProfile(tokenDoc) {
     barData,
   });
 
-  return await game.settings.set("barbrawl-profiles", "profiles", { profiles });
+  return await game.settings.set(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES, { profiles });
 }
 /**
  * Appends a context menu item for saving or loading profiles when the `#context-menu` element is attached.

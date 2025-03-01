@@ -15,7 +15,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   constructor(options) {
     super(options);
     this.profiles =
-      game.settings.get("barbrawl-profiles", "profiles")?.profiles ?? [];
+      game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES)?.profiles ?? [];
   }
 
   _openDialogs = new Collection();
@@ -88,7 +88,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
    * @param {FormDataExtended} formData - Processed data for the submitted form
    */
   static async #formHandler(event, form, formData) {
-    await game.settings.set("barbrawl-profiles", "profiles", {
+    await game.settings.set(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES, {
       profiles: this.profiles,
     });
 
@@ -202,7 +202,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
       return profile;
     });
     this.profiles = profiles;
-    await game.settings.set("barbrawl-profiles", "profiles", { profiles });
+    await game.settings.set(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES, { profiles });
     this.render();
   }
 
@@ -216,7 +216,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
   static async _exportJson(event, target) {
     event.preventDefault();
 
-    const settingData = game.settings.get("barbrawl-profiles", "profiles");
+    const settingData = game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES);
     const filename = `barbrawl-profiles-${new Date()
       .toISOString()
       .replace(/[:.]/g, "-")}`;
@@ -231,7 +231,7 @@ export default class BarbrawlProfileConfig extends HandlebarsApplicationMixin(
 
       if (!proceed) return;
 
-      await game.settings.set("barbrawl-profiles", "profiles", {
+      await game.settings.set(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES, {
         profiles: this.profiles,
       });
     }

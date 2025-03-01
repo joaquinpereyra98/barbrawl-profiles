@@ -3,6 +3,7 @@ const CONSTANTS = {
   SETTINGS: {
     PROFILES: "profiles",
     PROFILES_MENU: "barbrawlProfilesMenu",
+    PROFILES_TOKEN_MOLD: "barbrawlProfilesTokenMold"
   },
   BAR_VISIBILITY: {
     INHERIT: -1,

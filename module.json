@@ -21,9 +21,18 @@
   "readme": "README.md",
   "socket": true,
   "relationships": {
-    "systems": [],
-    "requires": [],
-    "conflicts": []
+    "requires": [
+      {
+        "id": "barbrawl",
+        "type": "module"
+      }
+    ],
+    "recommends": [
+      {
+        "id": "token-mold",
+        "type": "module"
+      }
+    ]
   },
   "esmodules": [
     "barbrawl-profiles.mjs"
