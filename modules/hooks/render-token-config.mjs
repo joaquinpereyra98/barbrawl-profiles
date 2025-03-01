@@ -8,6 +8,7 @@ import UTILS from "../utils.mjs";
 async function importProfile(tokenDoc) {
   const profiles =
     game.settings.get("barbrawl-profiles", "profiles")?.profiles ?? [];
+
   const profileChoices = profiles.reduce(
     (acc, { id, name }) => ({ ...acc, [id]: name }),
     {}
@@ -20,7 +21,7 @@ async function importProfile(tokenDoc) {
       choices: profileChoices,
       label: "Profiles",
       hint: `Select profile to import from settings to the Token ${tokenDoc.name}`,
-    }).toFormGroup().outerHTML,
+    }).toFormGroup({}, {name: "profileId"}).outerHTML,
     ok: {
       label: "Load Profile",
       icon: "fa-solid fa-file-import",
@@ -42,7 +43,7 @@ async function importProfile(tokenDoc) {
 
 /**
  * Export the bardata from a token to the world-setting
- * @param {TokenDocument} tokenDoc - The Token document instance 
+ * @param {TokenDocument} tokenDoc - The Token document instance
  * @returns {Object} - The assigned setting value
  */
 async function exportProfile(tokenDoc) {

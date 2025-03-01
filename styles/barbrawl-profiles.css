@@ -1,10 +1,25 @@
 .barbrawl-profile-config,
 .barbrawl-profile-dialog {
+    .header-container {
+        .input-name-container input {
+            height: 2.1rem;
+            font-size: 1.6rem;
+        }
+
+        .add-button {
+            flex: 0;
+            font-size: 30px;
+            margin: 0 0.5rem;
+        }
+    }
+
     .body-config {
         padding: 0.5rem;
         max-height: 500px;
         overflow-y: auto;
         overflow-x: hidden;
+
+
 
         .profiles-header {
             align-items: center;
@@ -65,7 +80,7 @@
                 input.color {
                     text-align: center;
                     min-width: 8ch;
-                    padding: 0;  
+                    padding: 0;
                 }
             }
 
