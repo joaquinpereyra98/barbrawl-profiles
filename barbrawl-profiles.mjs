@@ -53,3 +53,4 @@ Hooks.on("ready", () => {
 });
 
 Hooks.on("renderTokenConfig", hooks.onRenderTokenConfig);
+Hooks.on("createActor", hooks.onCreateActor);
