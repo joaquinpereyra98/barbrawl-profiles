@@ -25,7 +25,10 @@ export default function onRenderTokenMoldForm(app, $html) {
     choices: Object.fromEntries(profiles.map(({ id, name }) => [id, name])),
     label: "Profiles",
     hint: "Select profile to use when a new token is created.",
-  }).toFormGroup({ classes: ["barbrawl-profile-select"] }, { value: app.barbrawlProfiles.profile });
+  }).toFormGroup(
+    { classes: ["barbrawl-profile-select"] },
+    { value: app.barbrawlProfiles.profile }
+  );
 
   const overwriteBarData = new BooleanField({
     label: "Overwrite Profile",
@@ -42,6 +45,7 @@ export default function onRenderTokenMoldForm(app, $html) {
     ?.addEventListener("change", (event) => {
       const checkbox = event.target;
       app.barbrawlProfiles.overwrite = checkbox.checked;
+      app.render();
     });
 
   selectProfileInput
@@ -49,7 +53,22 @@ export default function onRenderTokenMoldForm(app, $html) {
     ?.addEventListener("change", (event) => {
       const select = event.target;
       app.barbrawlProfiles.profile = select.value;
+      app.render();
     });
 
   tab.prepend(overwriteBarData, selectProfileInput);
+
+  if (app.barbrawlProfiles.profile && app.barbrawlProfiles.overwrite) {
+    [
+      "[name='config.displayBars.use']",
+      "[name='config.displayBars.value']",
+      "[name='config.bar1.use']",
+      "[name='config.bar1.attribute']",
+      "[name='config.bar2.attribute']",
+      "[name='config.bar2.use']",
+    ].forEach((selector) => {
+      const element = tab.querySelector(selector);
+      if (element) element.disabled = true;
+    });
+  }
 }

@@ -26,11 +26,7 @@ Hooks.on("ready", () => {
     const originalOverwriteConfig = tokenMold._overwriteConfig;
     tokenMold._overwriteConfig = function (tokenData, actor) {
       originalOverwriteConfig.call(this, tokenData, actor);
-      
-      ["bar1.attribute", "bar2.attribute", "displayBars"].forEach(key => {
-        if (key in tokenData) delete tokenData[key];
-      });
-      
+
       const tokenMoldSettingData = game.settings.get(
         CONSTANTS.MODULE_ID,
         CONSTANTS.SETTINGS.PROFILES_TOKEN_MOLD
@@ -44,12 +40,17 @@ Hooks.on("ready", () => {
         const barData = profiles.find(
           (p) => p.id === tokenMoldSettingData.profile
         )?.barData;
+        if (barData) {
+          ["bar1.attribute", "bar2.attribute", "displayBars"].forEach((key) => {
+            if (key in tokenData) delete tokenData[key];
+          });
 
-        foundry.utils.setProperty(
-          tokenData,
-          "flags.barbrawl.resourceBars",
-          barData
-        );
+          foundry.utils.setProperty(
+            tokenData,
+            "flags.barbrawl.resourceBars",
+            barData
+          );
+        }
       }
       return tokenData;
     };
