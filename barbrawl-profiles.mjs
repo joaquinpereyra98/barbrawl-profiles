@@ -26,7 +26,7 @@ Hooks.on("ready", () => {
     const originalSetTokenData = tokenMold._setTokenData;
     tokenMold._setTokenData = function (scene, tokenData) {
       const newTokenData = originalSetTokenData.call(this, scene, tokenData);
-      console.log(newTokenData)
+
       const tokenMoldSettingData = game.settings.get(
         CONSTANTS.MODULE_ID,
         CONSTANTS.SETTINGS.PROFILES_TOKEN_MOLD

@@ -8,7 +8,8 @@ import CONSTANTS from "../constants.mjs";
  */
 async function importProfile(tokenDoc) {
   const profiles =
-    game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES)?.profiles ?? [];
+    game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES)
+      ?.profiles ?? [];
 
   const profileChoices = profiles.reduce(
     (acc, { id, name }) => ({ ...acc, [id]: name }),
@@ -22,7 +23,7 @@ async function importProfile(tokenDoc) {
       choices: profileChoices,
       label: "Profiles",
       hint: `Select profile to import from settings to the Token ${tokenDoc.name}`,
-    }).toFormGroup({}, {name: "profileId"}).outerHTML,
+    }).toFormGroup({}, { name: "profileId" }).outerHTML,
     ok: {
       label: "Load Profile",
       icon: "fa-solid fa-file-import",
@@ -35,10 +36,10 @@ async function importProfile(tokenDoc) {
 
   const barData = profiles.find((p) => p.id === profileId)?.barData;
   if (barData) {
-    return await tokenDoc.update(
+    await tokenDoc.update(
       { "flags.barbrawl.resourceBars": barData },
-      { diff: false }
-    );
+      { diff: false, recursive: false }
+    );  
   }
 }
 
@@ -51,7 +52,8 @@ async function exportProfile(tokenDoc) {
   const { StringField } = foundry.data.fields;
 
   const profiles =
-    game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES)?.profiles ?? [];
+    game.settings.get(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES)
+      ?.profiles ?? [];
 
   const nameField = new StringField(
     {
@@ -86,7 +88,11 @@ async function exportProfile(tokenDoc) {
     barData,
   });
 
-  return await game.settings.set(CONSTANTS.MODULE_ID, CONSTANTS.SETTINGS.PROFILES, { profiles });
+  return await game.settings.set(
+    CONSTANTS.MODULE_ID,
+    CONSTANTS.SETTINGS.PROFILES,
+    { profiles }
+  );
 }
 /**
  * Appends a context menu item for saving or loading profiles when the `#context-menu` element is attached.
