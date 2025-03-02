@@ -19,14 +19,18 @@ Hooks.on("ready", () => {
 
     const tokenMold = game["token-mold"];
 
-    if (!tokenMold || typeof tokenMold._setTokenData !== "function") {
+    if (!tokenMold || typeof tokenMold._overwriteConfig !== "function") {
       console.warn("Token Mold module or _setTokenData method not found.");
       return;
     }
-    const originalSetTokenData = tokenMold._setTokenData;
-    tokenMold._setTokenData = function (scene, tokenData) {
-      const newTokenData = originalSetTokenData.call(this, scene, tokenData);
-
+    const originalOverwriteConfig = tokenMold._overwriteConfig;
+    tokenMold._overwriteConfig = function (tokenData, actor) {
+      originalOverwriteConfig.call(this, tokenData, actor);
+      
+      ["bar1.attribute", "bar2.attribute", "displayBars"].forEach(key => {
+        if (key in tokenData) delete tokenData[key];
+      });
+      
       const tokenMoldSettingData = game.settings.get(
         CONSTANTS.MODULE_ID,
         CONSTANTS.SETTINGS.PROFILES_TOKEN_MOLD
@@ -42,12 +46,12 @@ Hooks.on("ready", () => {
         )?.barData;
 
         foundry.utils.setProperty(
-            newTokenData,
+          tokenData,
           "flags.barbrawl.resourceBars",
           barData
         );
       }
-      return newTokenData;
+      return tokenData;
     };
   }
 });
