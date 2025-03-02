@@ -19,6 +19,15 @@
         overflow-y: auto;
         overflow-x: hidden;
 
+        .delete-btn {
+            font-size: 0.7rem;
+            opacity: 0.5;
+            transition: 400ms;
+            &:hover {
+                opacity: 1;
+                font-size: 1;
+            }
+        }
 
 
         .profiles-header {

@@ -36,6 +36,7 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     position: { width: 480, height: "auto" },
     actions: {
       addResource: BarbrawlProfileDialog._addResource,
+      deleteResource: BarbrawlProfileDialog._deleteResource,
     },
   };
 
@@ -60,6 +61,9 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
 
   /** @override */
   static PARTS = {
+    header: {
+      template: `modules/${CONSTANTS.MODULE_ID}/templates/barbrawl-profile-dialog/header.hbs`,
+    },
     form: {
       template: `modules/${CONSTANTS.MODULE_ID}/templates/barbrawl-profile-dialog/form.hbs`,
     },
@@ -266,6 +270,23 @@ export default class BarbrawlProfileDialog extends HandlebarsApplicationMixin(
     const newBar = UTILS.getDefaultBarData(barsIds);
 
     this.profile.barData[newBar.id] = newBar;
-    this.render();
+    this.render({ parts: ["form"]});
+  }
+
+  /**
+   * Delete a resource for the profile, then updates the UI
+   *
+   * @param {PointerEvent} event - The click event that triggered the import.
+   * @param {HTMLElement} target - The HTML element that initiated the action, containing the [data-action] attribute.
+   */
+  static _deleteResource(event, target) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const barId = target.dataset.id;
+
+    delete this.profile.barData[barId];
+
+    this.render({ parts: ["form"]});
+
   }
 }
