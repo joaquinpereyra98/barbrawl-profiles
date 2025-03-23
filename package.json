@@ -8,8 +8,16 @@
   },
   "author": "JoaquinP",
   "license": "MIT",
-  "description": "",
   "dependencies": {
-    "rollup": "^4.24.3"
-  }
+    "rollup": "^4.36.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaquinpereyra98/barbrawl-profiles.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joaquinpereyra98/barbrawl-profiles/issues"
+  },
+  "homepage": "https://github.com/joaquinpereyra98/barbrawl-profiles#readme",
+  "description": ""
 }
