@@ -5,6 +5,14 @@ Profiles can also be assigned when create a new actor.
 
 ---
 
+## Requirements
+
+- **Bar Brawl Module** 
+- **FoundryVTT V12**
+- **Token Mold Module(optional)** 
+
+---
+
 ## Features
 
 - **Quick Profile Application:** Instantly load pre-configured bar settings to any token with ease.
