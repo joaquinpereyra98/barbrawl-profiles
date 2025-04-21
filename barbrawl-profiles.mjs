@@ -13,7 +13,7 @@ Hooks.on("init", () => {
 
 Hooks.on("ready", () => {
   registerSettings();
-  if (game.modules.get("token-mold")) {
+  if (game.modules.get("token-mold")?.active) {
     Hooks.on("renderTokenMoldForm", hooks.onRenderTokenMoldForm);
     Hooks.on("closeTokenMoldForm", hooks.onCloseTokenMoldForm);
 

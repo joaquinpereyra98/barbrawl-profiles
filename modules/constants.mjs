@@ -3,7 +3,10 @@ const CONSTANTS = {
   SETTINGS: {
     PROFILES: "profiles",
     PROFILES_MENU: "barbrawlProfilesMenu",
-    PROFILES_TOKEN_MOLD: "barbrawlProfilesTokenMold"
+    PROFILES_TOKEN_MOLD: "barbrawlProfilesTokenMold",
+    DEFAULT_PROFILE_BOOLEAN: "defaultProfileBoolean",
+    DEFAULT_PROFILE_VALUE: "defaultProfileValue",
+    ASK_PROFILE: "askProfile"
   },
   BAR_VISIBILITY: {
     INHERIT: -1,
